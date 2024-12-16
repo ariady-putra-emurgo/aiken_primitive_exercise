@@ -1,6 +1,11 @@
 use aiken/builtin
 use aiken/crypto.{VerificationKeyHash}
+use cardano/address.{Script, VerificationKey}
 use cardano/assets.{Lovelace}
+use cardano/governance.{
+  ConstitutionalCommitteeMember, DelegateRepresentative, StakePool,
+}
+use cardano/governance/voter
 
 test integer() {
   // Fix these:
@@ -94,6 +99,20 @@ test option() {
   when someone is {
     Some(body) -> body == one
     _ -> False
+  }
+}
+
+/// Fix test ordering() in any way possible, may be more than 1 ways.
+test ordering() {
+  let key = VerificationKey("VerificationKeyHash")
+  let script = Script("ScriptHash")
+
+  let pool = StakePool("VerificationKeyHash")
+
+  and {
+    ConstitutionalCommitteeMember(script) > ConstitutionalCommitteeMember(key),
+    DelegateRepresentative(key) < DelegateRepresentative(script),
+    voter.compare(pool, pool) == Equal,
   }
 }
 
